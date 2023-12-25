@@ -27,7 +27,6 @@ const client = new MongoClient(url); // create a new mongodb client
 const bcrypt = require('bcrypt') // to hash the password
 const saltRounds = 13 // the higher the number the more secure, but slower
 
-//
 async function run() {
     try {
         // Connect the client to the server

@@ -1,0 +1,20 @@
+POST http://localhost:3000/visitor/new
+Content-Type: application/json
+
+{
+    "host": "020202",
+    "apartment": "002",
+    "name": "Axel",
+    "carplate": "ABC4321",
+    "identification": "2345678901",
+    "mobile": "1234567890",
+    "visitpurpose": "general"
+}
+
+###
+POST http://localhost:3000/visitor/status
+Content-Type: application/json
+
+{
+    "_id": "20231224223844"
+}

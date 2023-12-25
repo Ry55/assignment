@@ -1,0 +1,63 @@
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+  "username": "010101",
+  "password": "password"
+}
+
+###
+POST http://localhost:3000/register/resident
+Content-Type: application/json
+    
+{
+    "_id": "050505",
+    "password": "050505",
+    "name": "Darth Vader",
+    "apartment": "005",
+    "mobile": "0505050505"
+}
+
+###
+POST http://localhost:3000/remove/resident
+Content-Type: application/json
+    
+{
+    "_id": "050505",
+    "apartment": "005"
+}
+
+###
+POST http://localhost:3000/register/security
+Content-Type: application/json
+    
+{
+    "_id": "070707",
+    "password": "070707",
+    "name": "Finn Mertens",
+    "mobile": "007007007"
+}
+
+###
+POST http://localhost:3000/remove/security
+Content-Type: application/json
+    
+{
+    "_id": "070707"
+}
+
+###
+
+GET http://localhost:3000/dashboard/
+
+###
+GET http://localhost:3000/dashboard/pending
+
+###
+GET http://localhost:3000/dashboard/approved
+
+###
+GET http://localhost:3000/dashboard/rejected
+
+###
+GET http://localhost:3000/logout

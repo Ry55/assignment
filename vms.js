@@ -38,6 +38,10 @@ async function run() {
         });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
+        app.get('/', (req, res) => {
+            res.send('Hello World!')
+        });
+
         app.post('/login', async (req, res) => {
             let data = req.body;
             // check if user exists

@@ -27,26 +27,7 @@ const client = new MongoClient(url); // create a new mongodb client
 const bcrypt = require('bcrypt') // to hash the password
 const saltRounds = 13 // the higher the number the more secure, but slower
 
-const swaggerUi = require('swagger-ui-express');
-const swaggerJsdoc = require('swagger-jsdoc');
-const options = {
-    definition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'VMS API',
-            version: '1.0.0',
-            description: 'A simple Express VMS API',
-        },
-        servers: {
-            url: 'http://localhost:3000',
-        },
-    },
-    apis: ['./vms.js'],
-};
-
-const specs = swaggerJsdoc(options);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
-
+//
 async function run() {
     try {
         // Connect the client to the server

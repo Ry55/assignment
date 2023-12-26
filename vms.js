@@ -23,7 +23,7 @@ const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'VMS API',
+            title: 'MyVMS',
             version: '1.0.0',
         },
     },
@@ -37,8 +37,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 /**
  * @swagger
  * tags:
+ *   - name: Visitor
  *   - name: Login
  *   - name: Admin
+ *   - name: Security
+ *   - name: Resident
  */
 
 // connect to mongodb
@@ -64,7 +67,7 @@ async function run() {
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
         app.get('/', (req, res) => {
-            res.send('Hello World!')
+            res.redirect('/api-docs');
         });
 
         /**
@@ -366,6 +369,40 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /visitor/new:
+         *   post:
+         *     tags:
+         *       - Visitor
+         *     description: Create a new visitor
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               host:
+         *                 type: string
+         *               apartment:
+         *                 type: string
+         *               name:
+         *                 type: string
+         *               carplate:
+         *                 type: string
+         *               identification:
+         *                 type: string
+         *               mobile:
+         *                 type: string
+         *               visitpurpose:
+         *                 type: string
+         *     responses:
+         *       '200':
+         *         description: Connection successful
+         */
+
+
         app.post('/visitor/new', async (req, res) => {
             req.body._id = visitoridgenerator();
             req.body.status = "pending";
@@ -435,6 +472,27 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /visitor/status:
+         *   post:
+         *     tags:
+         *       - Visitor
+         *     description: Check visitor status
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *     responses:
+         *       '200':
+         *         description: Connection successful
+         */
+
         app.post('/visitor/status', async (req, res) => {
             data = req.body;
             result = await client.db("Assignment").collection("Visitors").findOne({
@@ -457,6 +515,20 @@ async function run() {
                 res.send("Visitor not found");
             }
         });
+
+        /**
+         * @swagger
+         * /dashboard:
+         *   get:
+         *     tags:
+         *       - Admin
+         *       - Security
+         *       - Resident
+         *     description: Retrieve all visitors
+         *     responses:
+         *       '200':
+         *         description: Connection successful
+         */
 
         app.get('/dashboard', async (req, res) => {
             if (req.session.user) {
@@ -533,6 +605,20 @@ async function run() {
                 res.send("You are not logged in");
             }
         });
+
+        /**
+         * @swagger
+         * /dashboard/pending:
+         *   get:
+         *     tags:
+         *       - Admin
+         *       - Security
+         *       - Resident
+         *     description: Retrieve all pending visitors
+         *     responses:
+         *       '200':
+         *         description: Connection successful
+         */
 
         app.get('/dashboard/pending', async (req, res) => {
             if (req.session.user) {
@@ -612,6 +698,20 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /dashboard/approved:
+         *   get:
+         *     tags:
+         *       - Admin
+         *       - Security
+         *       - Resident
+         *     description: Retrieve all approved visitors
+         *     responses:
+         *       '200':
+         *         description: Connection successful
+         */
+
         app.get('/dashboard/approved', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "security" || req.session.user.role == "admin") {
@@ -688,6 +788,21 @@ async function run() {
                 res.send("You are not logged in");
             }
         });
+
+        /**
+         * @swagger
+         * /dashboard/rejected:
+         *   get:
+         *     tags:
+         *       - Admin
+         *       - Security
+         *       - Resident
+         *     description: Retrieve all rejected visitors
+         *     responses:
+         *       '200':
+         *         description: Connection successful
+         */
+
 
         app.get('/dashboard/rejected', async (req, res) => {
             if (req.session.user) {
@@ -773,6 +888,20 @@ async function run() {
             }
         });
 
+       /**
+         * @swagger
+         * /dashboard/history:
+         *   get:
+         *     tags:
+         *       - Admin
+         *       - Security
+         *       - Resident
+         *     description: Retrieve all past visitors
+         *     responses:
+         *       '200':
+         *         description: Connection successful
+         */
+
         app.get('/dashboard/history', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "security" || req.session.user.role == "admin") {
@@ -854,6 +983,39 @@ async function run() {
                 res.send("You are not logged in");
             }
         });
+        
+        /**
+         * @swagger
+         * /dashboard/create:
+         *   post:
+         *     tags:
+         *       - Resident
+         *     description: Create a new visitor invite
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               host:
+         *                 type: string
+         *               apartment:
+         *                 type: string
+         *               name:
+         *                 type: string
+         *               carplate:
+         *                 type: string
+         *               identification:
+         *                 type: string
+         *               mobile:
+         *                 type: string
+         *               visitpurpose:
+         *                 type: string
+         *     responses:
+         *       '200':
+         *         description: Connection successful
+         */
 
         app.post('/dashboard/create', async (req, res) => {
             if (req.session.user) {
@@ -940,6 +1102,27 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /dashboard/approve:
+         *   post:
+         *     tags:
+         *       - Resident
+         *     description: Approve a visitor
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *     responses:
+         *       '200':
+         *         description: Connection successful
+         */
+
         app.post('/dashboard/approve', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "resident") {
@@ -998,6 +1181,29 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /dashboard/reject:
+         *   post:
+         *     tags:
+         *       - Resident
+         *     description: Reject a visitor
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *               reason:
+         *                 type: string
+         *     responses:
+         *       '200':
+         *         description: Connection successful
+         */
+
         app.post('/dashboard/reject', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "resident") {
@@ -1055,6 +1261,27 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /checkin:
+         *   post:
+         *     tags:
+         *       - Security
+         *     description: Check in a visitor
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *     responses:
+         *       '200':
+         *         description: Connection successful
+         */
+
         app.post('/checkin', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "security") {
@@ -1094,6 +1321,27 @@ async function run() {
                 res.send("You are not logged in");
             }
         });
+
+        /**
+         * @swagger
+         * /checkout:
+         *   post:
+         *     tags:
+         *       - Security
+         *     description: Check out a visitor
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *     responses:
+         *       '200':
+         *         description: Connection successful
+         */
 
         app.post('/checkout', async (req, res) => {
             if (req.session.user) {
@@ -1146,6 +1394,18 @@ async function run() {
                 res.send("You are not logged in");
             }
         });
+
+        /**
+         * @swagger
+         * /logout:
+         *   get:
+         *     tags:
+         *       - Login
+         *     description: Logout
+         *     responses:
+         *       '200':
+         *         description: Connection successful
+         */
 
         app.get('/logout', async (req, res) => {
             if (req.session.user) {

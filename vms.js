@@ -23,7 +23,7 @@ const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'Welcome to FaruBon VMS API',
+            title: 'VMS API',
             version: '1.0.0',
         },
     },
@@ -37,14 +37,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 /**
  * @swagger
  * tags:
+ *   - name: Login
  *   - name: Admin
- *     description: Admin operations
- *   - name: Security
- *     description: Security operations
- *   - name: Resident
- *     description: Resident operations
- *   - name: Visitor
- *     description: Visitor operations
  */
 
 // connect to mongodb
@@ -77,10 +71,8 @@ async function run() {
          * @swagger
          * /login:
          *   post:
-         *     tags: 
-         *      - Admin
-         *      - Security
-         *      - Resident
+         *     tags:
+         *       - Login
          *     description: Login to the system
          *     requestBody:
          *       required: true
@@ -94,10 +86,8 @@ async function run() {
          *               password:
          *                 type: string
          *     responses:
-         *       200:
-         *         description: Login successful
-         *       400:
-         *         description: Login failed
+         *       '200':
+         *         description: Connection successful
          */
 
         app.post('/login', async (req, res) => {
@@ -126,6 +116,35 @@ async function run() {
                 res.send("Username not found");
             }
         });
+
+         /**
+         * @swagger
+         * /register/resident:
+         *   post:
+         *     tags:
+         *       - Admin
+         *     description: Register a new resident
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *               password:
+         *                 type: string
+         *               name:
+         *                 type: string
+         *               apartment:
+         *                 type: string
+         *               mobile:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Connection successful
+         */
 
         app.post('/register/resident', async (req, res) => {
             if (req.session.user)
@@ -171,6 +190,29 @@ async function run() {
             }
         });
 
+        /**
+         * @swagger
+         * /remove/resident:
+         *   post:
+         *     tags:
+         *       - Admin
+         *     description: Remove a resident
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *               apartment:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Connection successful
+         */
+
         app.post('/remove/resident', async (req, res) => {
             if (req.session.user)
                 if (req.session.user.role == "admin") {
@@ -203,6 +245,33 @@ async function run() {
                 res.send("You are not logged in");
             }
         });
+
+        /**
+         * @swagger
+         * /register/security:
+         *   post:
+         *     tags:
+         *       - Admin
+         *     description: Register a new security
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *               password:
+         *                 type: string
+         *               name:
+         *                 type: string
+         *               mobile:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Connection successful
+         */
 
         app.post('/register/security', async (req, res) => {
             if (req.session.user)
@@ -242,6 +311,27 @@ async function run() {
                 res.send("You are not logged in");
             }
         });
+
+        /**
+         * @swagger
+         * /remove/security:
+         *   post:
+         *     tags:
+         *       - Admin
+         *     description: Remove a resident
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Connection successful
+         */
 
         app.post('/remove/security', async (req, res) => {
             if (req.session.user)

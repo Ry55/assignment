@@ -16,6 +16,37 @@ app.use(express.json());
 // qr code middleware
 var QRCode = require('qrcode')
 
+// swagger middleware
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
+const options = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'Welcome to FaruBon VMS API',
+            version: '1.0.0',
+        },
+    },
+    apis: ['./vms.js'],
+};
+
+// swagger docs
+const specs = swaggerJsdoc(options);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+/**
+ * @swagger
+ * tags:
+ *   - name: Admin
+ *     description: Admin operations
+ *   - name: Security
+ *     description: Security operations
+ *   - name: Resident
+ *     description: Resident operations
+ *   - name: Visitor
+ *     description: Visitor operations
+ */
+
 // connect to mongodb
 const {
     MongoClient
@@ -41,6 +72,33 @@ async function run() {
         app.get('/', (req, res) => {
             res.send('Hello World!')
         });
+
+        /**
+         * @swagger
+         * /login:
+         *   post:
+         *     tags: 
+         *      - Admin
+         *      - Security
+         *      - Resident
+         *     description: Login to the system
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               username:
+         *                 type: string
+         *               password:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Login successful
+         *       400:
+         *         description: Login failed
+         */
 
         app.post('/login', async (req, res) => {
             let data = req.body;

@@ -734,7 +734,7 @@ async function run() {
                         // list all pending visitors
                         result = await client.db("Assignment").collection("Visitors").aggregate([{
                                 $match: {
-                                    host: req.session.user.username,
+                                    apartment: req.session.user.apartment,
                                     status: "pending"
                                 }
                             },

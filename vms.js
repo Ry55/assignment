@@ -451,8 +451,6 @@ async function run() {
          *           schema:
          *             type: object
          *             properties:
-         *               host:
-         *                 type: string
          *               apartment:
          *                 type: string
          *               name:
@@ -498,7 +496,6 @@ async function run() {
                             "message": "Your visitor request has been submitted, Please wait for approval from your host.",
                             "qrcode": url,
                             "visitorid": data._id,
-                            "host": data.host,
                             "apartment": data.apartment,
                             "name": data.name,
                             "carplate": data.carplate,
@@ -525,7 +522,6 @@ async function run() {
                 //             // "qrcode": string,
                 //             "qrcode": spacedString,
                 //             "visitorid": data._id,
-                //             "host": data.host,
                 //             "apartment": data.apartment,
                 //             "name": data.name,
                 //             "carplate": data.carplate,
@@ -611,7 +607,6 @@ async function run() {
                             {
                                 $project: {
                                     _id: 1,
-                                    host: 1,
                                     apartment: 1,
                                     name: 1,
                                     carplate: 1,
@@ -705,7 +700,6 @@ async function run() {
                             {
                                 $project: {
                                     _id: 1,
-                                    host: 1,
                                     apartment: 1,
                                     name: 1,
                                     carplate: 1,
@@ -797,7 +791,6 @@ async function run() {
                             {
                                 $project: {
                                     _id: 1,
-                                    host: 1,
                                     apartment: 1,
                                     name: 1,
                                     carplate: 1,
@@ -889,7 +882,6 @@ async function run() {
                             {
                                 $project: {
                                     _id: 1,
-                                    host: 1,
                                     apartment: 1,
                                     name: 1,
                                     carplate: 1,
@@ -987,7 +979,6 @@ async function run() {
                             {
                                 $project: {
                                     _id: 1,
-                                    host: 1,
                                     apartment: 1,
                                     name: 1,
                                     carplate: 1,
@@ -1066,8 +1057,6 @@ async function run() {
          *           schema:
          *             type: object
          *             properties:
-         *               host:
-         *                 type: string
          *               apartment:
          *                 type: string
          *               name:
@@ -1090,12 +1079,10 @@ async function run() {
                 if (req.session.user.role == "resident") {
                     req.body._id = visitoridgenerator();
                     req.body.status = "approved";
-                    req.body.host = req.session.user.username;
                     req.body.apartment = req.session.user.apartment;
                     data = req.body;
                     try {
                         await client.db("Assignment").collection("Users").updateOne({
-                            _id: data.host,
                             apartment: data.apartment
                         }, {
                             $push: {
@@ -1105,7 +1092,6 @@ async function run() {
 
                         const result = await client.db("Assignment").collection("Visitors").insertOne({
                             _id: data._id,
-                            host: data.host,
                             apartment: data.apartment,
                             name: data.name,
                             carplate: data.carplate,
@@ -1123,7 +1109,6 @@ async function run() {
                                     "message": "You have created a new visitor invite, Please send the QR code to your visitor.",
                                     "qrcode": url,
                                     "visitorid": data._id,
-                                    "host": data.host,
                                     "apartment": data.apartment,
                                     "name": data.name,
                                     "carplate": data.carplate,
@@ -1149,7 +1134,6 @@ async function run() {
                         //             // "qrcode": string,
                         //             "qrcode": spacedString,
                         //             "visitorid": data._id,
-                        //             "host": data.host,
                         //             "apartment": data.apartment,
                         //             "name": data.name,
                         //             "carplate": data.carplate,
@@ -1194,7 +1178,6 @@ async function run() {
         app.post('/dashboard/approve', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "resident") {
-                    host = req.session.user.username;
                     apartment = req.session.user.apartment;
                     data = req.body;
                     try {
@@ -1218,7 +1201,6 @@ async function run() {
                                 });
 
                                 await client.db("Assignment").collection("Users").updateOne({
-                                    _id: host,
                                     apartment: apartment
                                 }, {
                                     $pull: {
@@ -1275,7 +1257,6 @@ async function run() {
         app.post('/dashboard/reject', async (req, res) => {
             if (req.session.user) {
                 if (req.session.user.role == "resident") {
-                    host = req.session.user.username;
                     apartment = req.session.user.apartment;
                     data = req.body;
                     try {
@@ -1298,7 +1279,6 @@ async function run() {
                                 });
 
                                 await client.db("Assignment").collection("Users").updateOne({
-                                    _id: host,
                                     apartment: apartment
                                 }, {
                                     $pull: {

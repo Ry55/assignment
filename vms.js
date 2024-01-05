@@ -37,6 +37,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 /**
  * @swagger
  * tags:
+ *   - name: Test
  *   - name: Visitor
  *   - name: Login
  *   - name: Admin
@@ -191,6 +192,73 @@ async function run() {
             else {
                 res.send("You are not logged in");
             }
+        });
+
+        /**
+         * @swagger
+         * /register/test/resident:
+         *   post:
+         *     tags:
+         *       - Test
+         *     description: Register a new resident without admin approval
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *               password:
+         *                 type: string
+         *               name:
+         *                 type: string
+         *               apartment:
+         *                 type: string
+         *               mobile:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: Connection successful
+         */
+
+
+        app.post('/register/test/resident', async (req, res) => {
+            data = req.body;
+            try {
+                //check if user already exists
+                result = await client.db("Assignment").collection("Users").findOne({
+                    _id: data._id,
+                    role: "resident"
+                });
+
+                if (result) {
+                    res.send("User already exists");
+                } else {
+                    //hash password
+                    const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+
+                    //insert user
+                    const result = await client.db("Assignment").collection("Users").insertOne({
+                        _id: data._id,
+                        password: hashedPassword,
+                        role: "resident",
+                        name: data.name,
+                        apartment: data.apartment,
+                        mobile: data.mobile,
+                        pendingvisitors: [],
+                        incomingvisitors: [],
+                        pastvisitors: [],
+                        blockedvisitors: []
+                    });
+
+                    res.send('New resident created with the following id: ' + result.insertedId);
+                }
+            } catch (e) {
+                res.send("Error creating new resident");
+            }
+                
         });
 
         /**

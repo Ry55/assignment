@@ -13,8 +13,8 @@ app.use(session({
 // json middleware
 app.use(express.json());
 
-// qr code middleware
-var QRCode = require('qrcode')
+// // qr code middleware
+// var QRCode = require('qrcode')
 
 // swagger middleware
 const swaggerUi = require('swagger-ui-express');
@@ -487,24 +487,35 @@ async function run() {
                 // insert visitor into database
                 const result = await client.db("Assignment").collection("Visitors").insertOne(data);
 
-                // generate QR code
-                QRCode.toDataURL(data._id, (err, url) => {
-                    if (err) {
-                        res.send('Error generating QR code');
-                    } else {
-                        res.send({
-                            "message": "Your visitor request has been submitted, Please wait for approval from your host.",
-                            "qrcode": url,
-                            "visitorid": data._id,
-                            "apartment": data.apartment,
-                            "name": data.name,
-                            "carplate": data.carplate,
-                            "identification": data.identification,
-                            "mobile": data.mobile,
-                            "visitpurpose": data.visitpurpose,
-                        });
-                    }
+                res.send({
+                    "message": "Your visitor request has been submitted, Please wait for approval from your host.",
+                    "visitorid": data._id,
+                    "apartment": data.apartment,
+                    "name": data.name,
+                    "carplate": data.carplate,
+                    "identification": data.identification,
+                    "mobile": data.mobile,
+                    "visitpurpose": data.visitpurpose,
                 });
+
+                // // generate QR code
+                // QRCode.toDataURL(data._id, (err, url) => {
+                //     if (err) {
+                //         res.send('Error generating QR code');
+                //     } else {
+                //         res.send({
+                //             "message": "Your visitor request has been submitted, Please wait for approval from your host.",
+                //             "qrcode": url,
+                //             "visitorid": data._id,
+                //             "apartment": data.apartment,
+                //             "name": data.name,
+                //             "carplate": data.carplate,
+                //             "identification": data.identification,
+                //             "mobile": data.mobile,
+                //             "visitpurpose": data.visitpurpose,
+                //         });
+                //     }
+                // });
 
                 // // generate QR code
                 // QRCode.toString(data._id, {
@@ -532,7 +543,7 @@ async function run() {
                 //     }
                 // });
             } catch (e) {
-                res.send("Error creating new listing,either host or apartment not found");
+                res.send("Error creating new listing, apartment not found");
             }
         });
 
@@ -1101,23 +1112,34 @@ async function run() {
                             status: data.status
                         });
 
-                        QRCode.toDataURL(data._id,(err, url) => {
-                            if (err) {
-                                res.send('Error generating QR code');
-                            } else {
-                                res.send({
-                                    "message": "You have created a new visitor invite, Please send the QR code to your visitor.",
-                                    "qrcode": url,
-                                    "visitorid": data._id,
-                                    "apartment": data.apartment,
-                                    "name": data.name,
-                                    "carplate": data.carplate,
-                                    "identification": data.identification,
-                                    "mobile": data.mobile,
-                                    "visitpurpose": data.visitpurpose,
-                                });
-                            }
+                        res.send({
+                            "message": "You have created a new visitor invite, Please send the visitorid to your visitor.",
+                            "visitorid": data._id,
+                            "apartment": data.apartment,
+                            "name": data.name,
+                            "carplate": data.carplate,
+                            "identification": data.identification,
+                            "mobile": data.mobile,
+                            "visitpurpose": data.visitpurpose,
                         });
+
+                        // QRCode.toDataURL(data._id,(err, url) => {
+                        //     if (err) {
+                        //         res.send('Error generating QR code');
+                        //     } else {
+                        //         res.send({
+                        //             "message": "You have created a new visitor invite, Please send the QR code to your visitor.",
+                        //             "qrcode": url,
+                        //             "visitorid": data._id,
+                        //             "apartment": data.apartment,
+                        //             "name": data.name,
+                        //             "carplate": data.carplate,
+                        //             "identification": data.identification,
+                        //             "mobile": data.mobile,
+                        //             "visitpurpose": data.visitpurpose,
+                        //         });
+                        //     }
+                        // });
 
                         // QRCode.toString(data._id, {
                         //     type: "utf8"

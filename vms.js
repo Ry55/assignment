@@ -135,6 +135,8 @@ async function run() {
                                 }
                             ]).toArray();
 
+                            res.send("Hello " + result.name);
+
                             res.send({
                                 to: req.session.user.name,
                                 message: 'Here are the list of all residents: ',

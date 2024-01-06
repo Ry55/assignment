@@ -1536,7 +1536,6 @@ async function run() {
                 if (visitorResult) {
                     const visitorInfo = {
                         "message": "Visitor found",
-                        "apartment": visitorResult.apartment,
                         "name": visitorResult.name,
                         "carplate": visitorResult.carplate,
                         "visitpurpose": visitorResult.visitpurpose

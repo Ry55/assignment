@@ -1526,46 +1526,60 @@ async function run() {
          */
 
         app.post('/checkVisitor', async (req, res) => {
-            data = req.body;
+            const data = req.body;
+        
             try {
-                result = await client.db("Assignment").collection("Visitors").findOne({
+                const visitorResult = await client.db("Assignment").collection("Visitors").findOne({
                     _id: data._id
                 });
-
-                if (result) {
-                    res.send({
+        
+                if (visitorResult) {
+                    const visitorInfo = {
                         "message": "Visitor found",
-                        "apartment": result.apartment,
-                        "name": result.name,
-                        "carplate": result.carplate,
-                        "visitpurpose": result.visitpurpose
-                    });
+                        "apartment": visitorResult.apartment,
+                        "name": visitorResult.name,
+                        "carplate": visitorResult.carplate,
+                        "visitpurpose": visitorResult.visitpurpose
+                    };
+        
+                    try {
+                        const hostResult = await client.db("Assignment").collection("Users").findOne({
+                            apartment: visitorResult.apartment
+                        });
+        
+                        if (hostResult) {
+                            const hostInfo = {
+                                "message": "Here are the details of the host:",
+                                "name": hostResult.name,
+                                "apartment": hostResult.apartment,
+                                "mobile": hostResult.mobile
+                            };
+        
+                            const combinedInfo = {
+                                visitor: visitorInfo,
+                                host: hostInfo
+                            };
+        
+                            res.send(combinedInfo);
+                        } else {
+                            res.send({
+                                visitor: visitorInfo,
+                                host: "Host not found"
+                            });
+                        }
+                    } catch (error) {
+                        res.send({
+                            visitor: visitorInfo,
+                            host: "Error retrieving host"
+                        });
+                    }
                 } else {
                     res.send("Visitor not found");
                 }
-            } catch (e) {
+            } catch (err) {
                 res.send("Error retrieving visitor");
             }
-
-            try {
-                result = await client.db("Assignment").collection("Users").findOne({
-                    apartment: result.apartment
-                });
-
-                if (result) {
-                    res.send({
-                        "message": "Here are the informations of the host:",
-                        "name": result.name,
-                        "apartment": result.apartment,
-                        "mobile": result.mobile
-                    });
-                } else {
-                    res.send("Host not found");
-                }
-            } catch (e) {
-                res.send("Error retrieving host");
-            }
-        });
+        });        
 
         /**
          * @swagger

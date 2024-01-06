@@ -160,7 +160,7 @@ async function run() {
          *   post:
          *     tags:
          *       - Admin
-         *       - Resident
+         *       - Security
          *     description: Register a new resident
          *     requestBody:
          *       required: true
@@ -301,7 +301,7 @@ async function run() {
          *   post:
          *     tags:
          *       - Admin
-         *       - Resident
+         *       - Security
          *     description: Remove a resident
          *     requestBody:
          *       required: true

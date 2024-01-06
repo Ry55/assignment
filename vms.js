@@ -1374,8 +1374,12 @@ async function run() {
                                 });
 
                                 res.send('Visitor with the id: ' + data._id + " has been checked in");
-                            } else {
-                                res.send("Visitor is either not approved or already checked in");
+                            } else if (result.status == "pending"{
+                                res.send("Visitor is not approved yet");
+                            } else if (result.status == "rejected"{
+                                res.send("Visitor is rejected");
+                            }else {
+                                res.send("Visitor is already checked in");
                             }
                         } else {
                             res.send("Visitor not found");

@@ -113,13 +113,46 @@ async function run() {
                     }
                     console.log(req.session);
                     res.send("Hello " + result.name);
+
+                    if (req.session.user) {
+                        if (req.session.user.role == "admin") {
+                            try {
+                                result = await client.db("Assignment").collection("Users").aggregate([
+                                    {
+                                        $match: {
+                                            role: "resident",
+                                        }
+                                    },
+                                    {
+                                        $sort: {
+                                            _id: 1
+                                        }
+                                    },
+                                    {
+                                        $project: {
+                                            _id: 1,
+                                            name: 1,
+                                            apartment: 1,
+                                            mobile: 1,
+                                        }
+                                    }
+                                ]).toArray();
+        
+                                res.send({
+                                    to: req.session.user.name,
+                                    message: 'Here are the list of all residents: ',
+                                    visitors: result
+                                });
+                            } catch (e) {
+                                res.send("Error retrieving all residents");
+                            }
                 } else {
                     res.send("Wrong Password");
                 }
             } else {
                 res.send("Username not found");
             }
-        });
+    }}});
 
          /**
          * @swagger

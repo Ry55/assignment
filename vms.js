@@ -1504,6 +1504,46 @@ async function run() {
             }
         });
 
+        // to check the visitor's host from which apartment
+        app.post('/checkVisitor', async (req, res) => {
+            data = req.body;
+            try {
+                result = await client.db("Assignment").collection("Visitors").findOne({
+                    _id: data._id
+                });
+
+                if (result) {
+                    res.send({
+                        "message": "Visitor found",
+                        "apartment": result.apartment,
+                    });
+                } else {
+                    res.send("Visitor not found");
+                }
+            } catch (e) {
+                res.send("Error retrieving visitor");
+            }
+
+            try {
+                result = await client.db("Assignment").collection("Users").findOne({
+                    apartment: result.apartment
+                });
+
+                if (result) {
+                    res.send({
+                        "message": "Here are the informations of the host:",
+                        "name": result.name,
+                        "apartment": result.apartment,
+                        "mobile": result.mobile
+                    });
+                } else {
+                    res.send("Host not found");
+                }
+            } catch (e) {
+                res.send("Error retrieving host");
+            }
+        });
+
         /**
          * @swagger
          * /logout:

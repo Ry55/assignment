@@ -1538,7 +1538,10 @@ async function run() {
                         "message": "Visitor found",
                         "name": visitorResult.name,
                         "carplate": visitorResult.carplate,
-                        "visitpurpose": visitorResult.visitpurpose
+                        "identification": visitorResult.identification,
+                        "mobile": visitorResult.mobile,
+                        "visitpurpose": visitorResult.visitpurpose,
+                        "status": visitorResult.status
                     };
         
                     try {

@@ -1504,7 +1504,27 @@ async function run() {
             }
         });
 
-        // to check the visitor's host from which apartment
+        /**
+         * @swagger
+         * /checkVisitor:
+         *   post:
+         *     tags:
+         *       - Security
+         *     description: Check the information of the visitor and visitor's host
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               _id:
+         *                 type: string
+         *     responses:
+         *       '200':
+         *         description: Connection successful
+         */
+
         app.post('/checkVisitor', async (req, res) => {
             data = req.body;
             try {
@@ -1516,6 +1536,9 @@ async function run() {
                     res.send({
                         "message": "Visitor found",
                         "apartment": result.apartment,
+                        "name": result.name,
+                        "carplate": result.carplate,
+                        "visitpurpose": result.visitpurpose
                     });
                 } else {
                     res.send("Visitor not found");

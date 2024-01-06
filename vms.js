@@ -135,8 +135,8 @@ async function run() {
                                 }
                             ]).toArray();
 
-                            res.send(("Hello " + req.session.user.name),{
-                               
+                            res.send({
+                                to: req.session.user.name,
                                 message: 'Here are the list of all residents: ',
                                 residents: residents
                             });
@@ -160,6 +160,7 @@ async function run() {
          *   post:
          *     tags:
          *       - Admin
+         *       - Resident
          *     description: Register a new resident
          *     requestBody:
          *       required: true
@@ -185,7 +186,7 @@ async function run() {
 
         app.post('/register/resident', async (req, res) => {
             if (req.session.user)
-                if (req.session.user.role == "admin") {
+                if (req.session.user.role == "admin" || req.session.user.role == "security") {
                     data = req.body;
                     try {
                         //check if user already exists
@@ -300,6 +301,7 @@ async function run() {
          *   post:
          *     tags:
          *       - Admin
+         *       - Resident
          *     description: Remove a resident
          *     requestBody:
          *       required: true
@@ -319,7 +321,7 @@ async function run() {
 
         app.post('/remove/resident', async (req, res) => {
             if (req.session.user)
-                if (req.session.user.role == "admin") {
+                if (req.session.user.role == "admin" || req.session.user.role == "security") {
                     data = req.body;
                     try {
                         //check if user already exists

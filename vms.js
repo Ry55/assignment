@@ -13,6 +13,18 @@ app.use(session({
 // json middleware
 app.use(express.json());
 
+//password validator middleware
+const passwordValidator = require('password-validator');
+const schema = new passwordValidator();
+schema
+    .is().min(8, 'minimum length of 8 characters') // Minimum length 8
+    .is().max(20, 'maximum length of 20 characters') // Maximum length 20
+    .has().uppercase(1, 'minimum of 1 uppercase letter') // Must have uppercase letters
+    .has().lowercase(1, 'minimum of 1 lowercase letter') // Must have lowercase letters
+    .has().digits(1, 'minimum of 1 digit') // Must have digits
+    .has().not().spaces(0, 'no spaces') // Should not have spaces
+    .has().symbols(1, 'minimum of 1 symbol') // Must have symbols
+
 // // qr code middleware
 // var QRCode = require('qrcode')
 
@@ -172,6 +184,7 @@ async function run() {
          *               _id:
          *                 type: string
          *               password:
+         *                 description: Password must contain at least 8 characters, 1 uppercase letter, 1 lowercase letter, 1 digit, 1 symbol and no spaces
          *                 type: string
          *               name:
          *                 type: string
@@ -198,33 +211,44 @@ async function run() {
                         if (result) {
                             res.send("User already exists");
                         } else {
-                            //hash password
-                            const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+                            //validate password
+                            const validation = schema.validate(data.password, {
+                                details: true
+                            });
 
-                            // Validate if users insert a non-number for id, apartment, or mobile
-                            if (!/^\d+$/.test(data._id) || !/^\d+$/.test(data.apartment) || !/^\d+$/.test(data.mobile)) {
-                                res.send("Please insert a valid number for id, apartment and mobile");
-                            }
-                            // Validate if users insert a non-alphabetic value for name
-                            else if (!/^[a-zA-Z]+$/.test(data.name)) {
-                                res.send("Please insert an alphabet for name");
+                            if (validation.length > 0) {
+                                errorMessages = validation.map((detail) => detail.message).join('\n');
+                                res.send("Password does not meet the following requirements: \n" + errorMessages);
                             }
                             else {
-                                //insert user
-                                const result = await client.db("Assignment").collection("Users").insertOne({
-                                    _id: data._id,
-                                    password: hashedPassword,
-                                    role: "resident",
-                                    name: data.name,
-                                    apartment: data.apartment,
-                                    mobile: data.mobile,
-                                    pendingvisitors: [],
-                                    incomingvisitors: [],
-                                    pastvisitors: [],
-                                    blockedvisitors: []
-                                });
+                                //hash password
+                                const hashedPassword = await bcrypt.hash(data.password, saltRounds);
 
-                                res.send('New resident created with the following id: ' + result.insertedId);
+                                // Validate if users insert a non-number for id, apartment, or mobile
+                                if (!/^\d+$/.test(data._id) || !/^\d+$/.test(data.apartment) || !/^\d+$/.test(data.mobile)) {
+                                    res.send("Please insert a valid number for id, apartment and mobile");
+                                }
+                                // Validate if users insert a non-alphabetic value for name
+                                else if (!/^[a-zA-Z]+$/.test(data.name)) {
+                                    res.send("Please insert an alphabet for name");
+                                }
+                                else {
+                                    //insert user
+                                    const result = await client.db("Assignment").collection("Users").insertOne({
+                                        _id: data._id,
+                                        password: hashedPassword,
+                                        role: "resident",
+                                        name: data.name,
+                                        apartment: data.apartment,
+                                        mobile: data.mobile,
+                                        pendingvisitors: [],
+                                        incomingvisitors: [],
+                                        pastvisitors: [],
+                                        blockedvisitors: []
+                                    });
+
+                                    res.send('New resident created with the following id: ' + result.insertedId);
+                                }
                             }
                         }
                     } catch (e) {
@@ -255,6 +279,7 @@ async function run() {
          *               _id:
          *                 type: string
          *               password:
+         *                 description: Password must contain at least 8 characters, 1 uppercase letter, 1 lowercase letter, 1 digit, 1 symbol and no spaces
          *                 type: string
          *               name:
          *                 type: string
@@ -279,34 +304,46 @@ async function run() {
 
                 if (result) {
                     res.send("User already exists");
-                } else {
-                    //hash password
-                    const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+                } 
+                else {
+                    //validate password
+                    const validation = schema.validate(data.password, {
+                        details: true
+                    });
 
-                    // Validate if users insert a non-number for id, apartment, or mobile
-                    if (!/^\d+$/.test(data._id) || !/^\d+$/.test(data.apartment) || !/^\d+$/.test(data.mobile)) {
-                        res.send("Please insert a valid number for id, apartment and mobile");
-                    }
-                    // Validate if users insert a non-alphabetic value for name
-                    else if (!/^[a-zA-Z]+$/.test(data.name)) {
-                        res.send("Please insert an alphabet for name");
-                    }
+                    if (validation.length > 0) {
+                        errorMessages = validation.map((detail) => detail.message).join('\n');
+                        res.send("Password does not meet the following requirements: \n" + errorMessages);
+                    } 
                     else {
-                        //insert user
-                        const result = await client.db("Assignment").collection("Users").insertOne({
-                            _id: data._id,
-                            password: hashedPassword,
-                            role: "resident",
-                            name: data.name,
-                            apartment: data.apartment,
-                            mobile: data.mobile,
-                            pendingvisitors: [],
-                            incomingvisitors: [],
-                            pastvisitors: [],
-                            blockedvisitors: []
-                        });
+                        //hash password
+                        const hashedPassword = await bcrypt.hash(data.password, saltRounds);
 
-                        res.send('New resident created with the following id: ' + result.insertedId);
+                        // Validate if users insert a non-number for id, apartment, or mobile
+                        if (!/^\d+$/.test(data._id) || !/^\d+$/.test(data.apartment) || !/^\d+$/.test(data.mobile)) {
+                            res.send("Please insert a valid number for id, apartment and mobile");
+                        }
+                        // Validate if users insert a non-alphabetic value for name
+                        else if (!/^[a-zA-Z]+$/.test(data.name)) {
+                            res.send("Please insert an alphabet for name");
+                        }
+                        else {
+                            //insert user
+                            const result = await client.db("Assignment").collection("Users").insertOne({
+                                _id: data._id,
+                                password: hashedPassword,
+                                role: "resident",
+                                name: data.name,
+                                apartment: data.apartment,
+                                mobile: data.mobile,
+                                pendingvisitors: [],
+                                incomingvisitors: [],
+                                pastvisitors: [],
+                                blockedvisitors: []
+                            });
+
+                            res.send('New resident created with the following id: ' + result.insertedId);
+                        }
                     }
                 }
             } catch (e) {
@@ -412,29 +449,41 @@ async function run() {
 
                         if (result) {
                             res.send("User already exists");
-                        } else {
-                            //hash password
-                            const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+                        } 
+                        else {
+                            //validate password
+                            const validation = schema.validate(data.password, {
+                                details: true
+                            });
 
-                            // Validate if users insert a non-number for id and mobile
-                            if (!/^\d+$/.test(data._id) || !/^\d+$/.test(data.mobile)) {
-                                res.send("Please insert a valid number for id and mobile");
-                            }
-                            // Validate if users insert a non-alphabetic value for name
-                            else if (!/^[a-zA-Z]+$/.test(data.name)) {
-                                res.send("Please insert an alphabet for name");
-                            }
+                            if (validation.length > 0) {
+                                errorMessages = validation.map((detail) => detail.message).join('\n');
+                                res.send("Password does not meet the following requirements: \n" + errorMessages);
+                            } 
                             else {
-                                //insert user
-                                const result = await client.db("Assignment").collection("Users").insertOne({
-                                    _id: data._id,
-                                    password: hashedPassword,
-                                    role: "security",
-                                    name: data.name,
-                                    mobile: data.mobile
-                                });
+                                //hash password
+                                const hashedPassword = await bcrypt.hash(data.password, saltRounds);
 
-                                res.send('New security created with the following id: ' + result.insertedId);
+                                // Validate if users insert a non-number for id and mobile
+                                if (!/^\d+$/.test(data._id) || !/^\d+$/.test(data.mobile)) {
+                                    res.send("Please insert a valid number for id and mobile");
+                                }
+                                // Validate if users insert a non-alphabetic value for name
+                                else if (!/^[a-zA-Z]+$/.test(data.name)) {
+                                    res.send("Please insert an alphabet for name");
+                                }
+                                else {
+                                    //insert user
+                                    const result = await client.db("Assignment").collection("Users").insertOne({
+                                        _id: data._id,
+                                        password: hashedPassword,
+                                        role: "security",
+                                        name: data.name,
+                                        mobile: data.mobile
+                                    });
+
+                                    res.send('New security created with the following id: ' + result.insertedId);
+                                }
                             }
                         }
                     } catch (e) {

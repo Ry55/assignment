@@ -21,10 +21,13 @@ const {
 //connect-mongo session middleware
 const MongoStore = require('connect-mongo');
 const store = MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI,
+    mongoUrl: process.env.URL || "mongodb+srv://rruyingg:200105054130@cluster0.cwvxo8n.mongodb.net/",
     dbName: "Assignment",
     collectionName: "Sessions",
-    ttl: 60 * 60 * 24, // 1 day
+    //ttl will be automatically set to the maxAge (1 hour)
+    crypto:{
+        secret: process.env.SECRET2
+    }
 });
 
 // session middleware

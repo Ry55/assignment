@@ -3,15 +3,71 @@ const session = require('express-session');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// session middleware
-app.use(session({
-    secret: process.env.SECRET || "supercalifragilisticexpialidocious", // a random string used for encryption
-    resave: false, // don't save session if unmodified
-    saveUninitialized: false // don't create session until something stored
-}));
-
 // json middleware
 app.use(express.json());
+
+// connect to mongodb
+const {
+    MongoClient
+} = require('mongodb'); // import the mongodb client
+const url = process.env.URL || "mongodb+srv://rruyingg:200105054130@cluster0.cwvxo8n.mongodb.net/"; // the url to the database
+const client = new MongoClient(url); // create a new mongodb client
+
+//unique session id generator middleware
+const {
+    v4: uuidv4
+} = require('uuid');
+
+//connect-mongo session middleware
+const MongoStore = require('connect-mongo');
+const store = MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    dbName: "Assignment",
+    collectionName: "Sessions",
+    ttl: 60 * 60 * 24, // 1 day
+});
+
+// session middleware
+app.use(session({
+    //generate unique session id
+    genid: (req) => {
+        return uuidv4()
+    },
+    secret: process.env.SECRET || "supercalifragilisticexpialidocious", // a random string used for encryption
+    resave: false, // don't save session if unmodified
+    saveUninitialized: false, // don't create session until something stored
+    cookie: {
+        maxAge: 1000 * 60 * 60, // 1 hour
+        httpOnly:true,
+        sameSite:"strict"
+    },
+    store:store
+}));
+
+//check and refresh the session
+app.use((req, res, next) => {
+    //check if the session is about to expire
+    if (req.session) {
+        if (req.session.cookie.maxAge < 1000 * 60 * 5) { // 5 minutes
+            //refresh the session
+            req.session.regenerate((err) => {
+                if (err) {
+                    res.send("Error refreshing session");
+                } else {
+                    next();
+                }
+            })
+        } else {
+            next();
+        }
+    } else {
+        next();
+    }
+});
+
+// bcrypt middleware
+const bcrypt = require('bcryptjs') // to hash the password
+const saltRounds = 13 // the higher the number the more secure, but slower
 
 //password validator middleware
 const passwordValidator = require('password-validator');
@@ -57,17 +113,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *   - name: Resident
  */
 
-// connect to mongodb
-const {
-    MongoClient
-} = require('mongodb'); // import the mongodb client
-const url = process.env.URL || "mongodb+srv://rruyingg:200105054130@cluster0.cwvxo8n.mongodb.net/"; // the url to the database
-const client = new MongoClient(url); // create a new mongodb client
-
-// bcrypt middleware
-const bcrypt = require('bcryptjs') // to hash the password
-const saltRounds = 13 // the higher the number the more secure, but slower
-
 async function run() {
     try {
         // Connect the client to the server
@@ -108,63 +153,97 @@ async function run() {
 
         app.post('/login', async (req, res) => {
             let data = req.body;
+        
             // check if user exists
             const result = await client.db("Assignment").collection("Users").findOne({
                 _id: data.username
             });
-
+        
             // if user exists, check if password is correct
             if (result) {
                 if (await bcrypt.compare(data.password, result.password)) {
                     // if password is correct, create a session
-                    req.session.user = {
-                        name: result.name,
-                        username: result._id,
-                        role: result.role,
-                        apartment: result.apartment
-                    };
-                    console.log(req.session);
-                    if (req.session.user.role === "admin") {
-                        try {
-                            const residents = await client.db("Assignment").collection("Users").aggregate([
-                                {
-                                    $match: {
-                                        role: "resident",
-                                    }
-                                },
-                                {
-                                    $sort: {
-                                        _id: 1
-                                    }
-                                },
-                                {
-                                    $project: {
-                                        _id: 1,
-                                        name: 1,
-                                        apartment: 1,
-                                        mobile: 1,
-                                    }
-                                }
-                            ]).toArray();
+                    console.log('Session ID before regeneration:', req.sessionID, req.session);
+        
+                    // regenerate session
+                    req.session.regenerate(async (err) => {
+                        if (err) {
+                            res.send("Error regenerating session");
+                        } else {
+                            // store user details in session
+                            req.session.user = {
+                                name: result.name,
+                                username: result._id,
+                                role: result.role,
+                                apartment: result.apartment
+                            }
+        
+                            console.log('Session ID after regeneration:', req.sessionID, req.session);
+        
+                            if (req.session.user.role === "admin") {
+                                try {
+                                    const residents = await client.db("Assignment").collection("Users").aggregate([
+                                        {
+                                            $match: {
+                                                role: "resident",
+                                            }
+                                        },
+                                        {
+                                            $sort: {
+                                                _id: 1
+                                            }
+                                        },
+                                        {
+                                            $project: {
+                                                _id: 1,
+                                                name: 1,
+                                                apartment: 1,
+                                                mobile: 1,
+                                            }
+                                        }
+                                    ]).toArray();
 
-                            res.send({
-                                to: req.session.user.name,
-                                message: 'Here are the list of all residents: ',
-                                residents: residents
-                            });
-                        } catch (e) {
-                            res.status(500).send("Error retrieving all residents");
+                                    const securities = await client.db("Assignment").collection("Users").aggregate([
+                                        {
+                                            $match: {
+                                                role: "security",
+                                            }
+                                        },
+                                        {
+                                            $sort: {
+                                                _id: 1
+                                            }
+                                        },
+                                        {
+                                            $project: {
+                                                _id: 1,
+                                                name: 1,
+                                                mobile: 1,
+                                            }
+                                        }
+                                    ]).toArray();
+        
+                                    res.send({
+                                        to: req.session.user.name,
+                                        message: 'Here are the list of all residents and securities: ',
+                                        residents: residents,
+                                        securities: securities
+                                    });
+                                } catch (e) {
+                                    res.send("Error retrieving all residents");
+                                }
+                            } else {
+                                res.send("Hello " + result.name);
+                            }
                         }
-                    } else {
-                        res.send("Hello " + result.name);
-                    }
+                    });
                 } else {
                     res.send("Wrong Password");
                 }
             } else {
                 res.send("Username not found");
             }
-        });
+        });        
 
          /**
          * @swagger

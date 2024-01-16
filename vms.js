@@ -17,7 +17,7 @@ const limiter = rateLimit({
 const {
     MongoClient
 } = require('mongodb'); // import the mongodb client
-const url = process.env.URL || "mongodb+srv://rruyingg:200105054130@cluster0.cwvxo8n.mongodb.net/"; // the url to the database
+const url = process.env.URL || "mongodb+srv://rruyingg:200105054130@cluster0.cwvxo8n.mongodb.net/" // the url to the database
 const client = new MongoClient(url); // create a new mongodb client
 
 //unique session id generator middleware

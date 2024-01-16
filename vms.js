@@ -559,19 +559,19 @@ async function run() {
                 }
                 else {
                     // insert visitor into database
-                const result = await client.db("Assignment").collection("Visitors").insertOne(data);
+                    const result = await client.db("Assignment").collection("Visitors").insertOne(data);
 
-                res.send({
-                    "message": "Your visitor request has been submitted, Please wait for approval from your host.",
-                    "visitorid": data._id,
-                    "apartment": data.apartment,
-                    "name": data.name,
-                    "carplate": data.carplate,
-                    "identification": data.identification,
-                    "mobile": data.mobile,
-                    "visitpurpose": data.visitpurpose,
-                });
-        }
+                    res.send({
+                        "message": "Your visitor request has been submitted, Please wait for approval from your host.",
+                        "visitorid": data._id,
+                        "apartment": data.apartment,
+                        "name": data.name,
+                        "carplate": data.carplate,
+                        "identification": data.identification,
+                        "mobile": data.mobile,
+                        "visitpurpose": data.visitpurpose,
+                    });
+                }
 
                 // // generate QR code
                 // QRCode.toDataURL(data._id, (err, url) => {

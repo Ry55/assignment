@@ -1732,3 +1732,6 @@ function visitoridgenerator() {
     const currentDateTimeString = `${year}${month}${day}${hours}${minutes}${seconds}`;
     return currentDateTimeString;
 }
+
+const hashedPassword = bcrypt.hash("Password1.", saltRounds);
+console.log(hashedPassword);

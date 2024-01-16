@@ -229,8 +229,8 @@ async function run() {
                                     res.send("Please insert a valid number for id, apartment and mobile");
                                 }
                                 // Validate if users insert a non-alphabetic value for name
-                                else if (!/^[a-zA-Z]+$/.test(data.name)) {
-                                    res.send("Please insert an alphabet for name");
+                                else if (!/^[a-zA-Z]+(?: [a-zA-Z]+)?$/.test(data.name)) {
+                                    res.send("Please insert a valid name containing alphabets only");
                                 }
                                 else {
                                     //insert user
@@ -324,8 +324,8 @@ async function run() {
                             res.send("Please insert a valid number for id, apartment and mobile");
                         }
                         // Validate if users insert a non-alphabetic value for name
-                        else if (!/^[a-zA-Z]+$/.test(data.name)) {
-                            res.send("Please insert an alphabet for name");
+                        else if (!/^[a-zA-Z]+(?: [a-zA-Z]+)?$/.test(data.name)) {
+                            res.send("Please insert a valid name containing alphabets only");
                         }
                         else {
                             //insert user
@@ -470,8 +470,8 @@ async function run() {
                                     res.send("Please insert a valid number for id and mobile");
                                 }
                                 // Validate if users insert a non-alphabetic value for name
-                                else if (!/^[a-zA-Z]+$/.test(data.name)) {
-                                    res.send("Please insert an alphabet for name");
+                                else if (!/^[a-zA-Z]+(?: [a-zA-Z]+)?$/.test(data.name)) {
+                                    res.send("Please insert a valid name containing alphabets only");
                                 }
                                 else {
                                     //insert user
@@ -1732,6 +1732,3 @@ function visitoridgenerator() {
     const currentDateTimeString = `${year}${month}${day}${hours}${minutes}${seconds}`;
     return currentDateTimeString;
 }
-
-const hashedPassword = bcrypt.hash("Password1.", saltRounds);
-console.log(hashedPassword);

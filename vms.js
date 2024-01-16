@@ -1,11 +1,11 @@
 const express = require('express');
 const session = require('express-session');
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 
 // session middleware
 app.use(session({
-    secret: process.env.SECRET, // a random string used for encryption
+    secret: process.env.SECRET || "supercalifragilisticexpialidocious", // a random string used for encryption
     resave: false, // don't save session if unmodified
     saveUninitialized: false // don't create session until something stored
 }));
@@ -49,7 +49,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 const {
     MongoClient
 } = require('mongodb'); // import the mongodb client
-const url = process.env.URL; // the url to the database
+const url = process.env.URL || "mongodb+srv://rruyingg:200105054130@cluster0.cwvxo8n.mongodb.net/"; // the url to the database
 const client = new MongoClient(url); // create a new mongodb client
 
 // bcrypt middleware
@@ -86,7 +86,7 @@ async function run() {
          *             type: object
          *             properties:
          *               username:
-         *                 type: string
+         *                 type: number
          *               password:
          *                 type: string
          *     responses:
@@ -170,15 +170,15 @@ async function run() {
          *             type: object
          *             properties:
          *               _id:
-         *                 type: string
+         *                 type: number
          *               password:
          *                 type: string
          *               name:
          *                 type: string
          *               apartment:
-         *                 type: string
+         *                 type: number
          *               mobile:
-         *                 type: string
+         *                 type: number
          *     responses:
          *       200:
          *         description: Connection successful
@@ -201,37 +201,29 @@ async function run() {
                             //hash password
                             const hashedPassword = await bcrypt.hash(data.password, saltRounds);
 
-                            // Ensure that id, apartment, and mobile are inserted as numbers
-                            data._id = parseInt(data._id);
-                            data.apartment = parseInt(data.apartment);
-                            data.mobile = parseInt(data.mobile);
-
-                            // Ensure that name is inserted as a string
-                            data.name = data.name.toString();
-
-                            //insert user
-                            const result = await client.db("Assignment").collection("Users").insertOne({
-                                _id: data._id,
-                                password: hashedPassword,
-                                role: "resident",
-                                name: data.name,
-                                apartment: data.apartment,
-                                mobile: data.mobile,
-                                pendingvisitors: [],
-                                incomingvisitors: [],
-                                pastvisitors: [],
-                                blockedvisitors: []
-                            });
-
-                            //if users insert a non-number for id, apartment, or mobile, send an error
-                            if (isNaN(data._id) || isNaN(data.apartment) || isNaN(data.mobile)) {
-                                res.send("Please insert a number for id, apartment, and mobile");
+                            // Validate if users insert a non-number for id, apartment, or mobile
+                            if (!/^\d+$/.test(data._id) || !/^\d+$/.test(data.apartment) || !/^\d+$/.test(data.mobile)) {
+                                res.send("Please insert a valid number for id, apartment and mobile");
                             }
-                            //if users insert a non-string for name, send an error
-                            else if (typeof data.name != "string") {
-                                res.send("Please insert a string for name");
+                            // Validate if users insert a non-alphabetic value for name
+                            else if (!/^[a-zA-Z]+$/.test(data.name)) {
+                                res.send("Please insert an alphabet for name");
                             }
                             else {
+                                //insert user
+                                const result = await client.db("Assignment").collection("Users").insertOne({
+                                    _id: data._id,
+                                    password: hashedPassword,
+                                    role: "resident",
+                                    name: data.name,
+                                    apartment: data.apartment,
+                                    mobile: data.mobile,
+                                    pendingvisitors: [],
+                                    incomingvisitors: [],
+                                    pastvisitors: [],
+                                    blockedvisitors: []
+                                });
+
                                 res.send('New resident created with the following id: ' + result.insertedId);
                             }
                         }
@@ -261,15 +253,15 @@ async function run() {
          *             type: object
          *             properties:
          *               _id:
-         *                 type: string
+         *                 type: number
          *               password:
          *                 type: string
          *               name:
          *                 type: string
          *               apartment:
-         *                 type: string
+         *                 type: number
          *               mobile:
-         *                 type: string
+         *                 type: number
          *     responses:
          *       200:
          *         description: Connection successful
@@ -291,21 +283,31 @@ async function run() {
                     //hash password
                     const hashedPassword = await bcrypt.hash(data.password, saltRounds);
 
-                    //insert user
-                    const result = await client.db("Assignment").collection("Users").insertOne({
-                        _id: data._id,
-                        password: hashedPassword,
-                        role: "resident",
-                        name: data.name,
-                        apartment: data.apartment,
-                        mobile: data.mobile,
-                        pendingvisitors: [],
-                        incomingvisitors: [],
-                        pastvisitors: [],
-                        blockedvisitors: []
-                    });
+                    // Validate if users insert a non-number for id, apartment, or mobile
+                    if (!/^\d+$/.test(data._id) || !/^\d+$/.test(data.apartment) || !/^\d+$/.test(data.mobile)) {
+                        res.send("Please insert a valid number for id, apartment and mobile");
+                    }
+                    // Validate if users insert a non-alphabetic value for name
+                    else if (!/^[a-zA-Z]+$/.test(data.name)) {
+                        res.send("Please insert an alphabet for name");
+                    }
+                    else {
+                        //insert user
+                        const result = await client.db("Assignment").collection("Users").insertOne({
+                            _id: data._id,
+                            password: hashedPassword,
+                            role: "resident",
+                            name: data.name,
+                            apartment: data.apartment,
+                            mobile: data.mobile,
+                            pendingvisitors: [],
+                            incomingvisitors: [],
+                            pastvisitors: [],
+                            blockedvisitors: []
+                        });
 
-                    res.send('New resident created with the following id: ' + result.insertedId);
+                        res.send('New resident created with the following id: ' + result.insertedId);
+                    }
                 }
             } catch (e) {
                 res.send("Error creating new resident");
@@ -329,9 +331,9 @@ async function run() {
          *             type: object
          *             properties:
          *               _id:
-         *                 type: string
+         *                 type: number
          *               apartment:
-         *                 type: string
+         *                 type: number
          *     responses:
          *       200:
          *         description: Connection successful
@@ -385,13 +387,13 @@ async function run() {
          *             type: object
          *             properties:
          *               _id:
-         *                 type: string
+         *                 type: number
          *               password:
          *                 type: string
          *               name:
          *                 type: string
          *               mobile:
-         *                 type: string
+         *                 type: number
          *     responses:
          *       200:
          *         description: Connection successful
@@ -414,16 +416,26 @@ async function run() {
                             //hash password
                             const hashedPassword = await bcrypt.hash(data.password, saltRounds);
 
-                            //insert user
-                            const result = await client.db("Assignment").collection("Users").insertOne({
-                                _id: data._id,
-                                password: hashedPassword,
-                                role: "security",
-                                name: data.name,
-                                mobile: data.mobile
-                            });
+                            // Validate if users insert a non-number for id and mobile
+                            if (!/^\d+$/.test(data._id) || !/^\d+$/.test(data.mobile)) {
+                                res.send("Please insert a valid number for id and mobile");
+                            }
+                            // Validate if users insert a non-alphabetic value for name
+                            else if (!/^[a-zA-Z]+$/.test(data.name)) {
+                                res.send("Please insert an alphabet for name");
+                            }
+                            else {
+                                //insert user
+                                const result = await client.db("Assignment").collection("Users").insertOne({
+                                    _id: data._id,
+                                    password: hashedPassword,
+                                    role: "security",
+                                    name: data.name,
+                                    mobile: data.mobile
+                                });
 
-                            res.send('New security created with the following id: ' + result.insertedId);
+                                res.send('New security created with the following id: ' + result.insertedId);
+                            }
                         }
                     } catch (e) {
                         res.send("Error creating new security");
@@ -451,7 +463,7 @@ async function run() {
          *             type: object
          *             properties:
          *               _id:
-         *                 type: string
+         *                 type: number
          *     responses:
          *       200:
          *         description: Connection successful
@@ -505,15 +517,15 @@ async function run() {
          *             type: object
          *             properties:
          *               apartment:
-         *                 type: string
+         *                 type: number
          *               name:
          *                 type: string
          *               carplate:
-         *                 type: string
+         *                 type: number
          *               identification:
-         *                 type: string
+         *                 type: number
          *               mobile:
-         *                 type: string
+         *                 type: number
          *               visitpurpose:
          *                 type: string
          *     responses:
@@ -537,7 +549,16 @@ async function run() {
                     }
                 });
 
-                // insert visitor into database
+                // Validate if users insert a non-number for carplate, identification, or mobile
+                if (!/^\d+$/.test(data.carplate) || !/^\d+$/.test(data.identification) || !/^\d+$/.test(data.mobile)) {
+                    res.send("Please insert a valid number for carplate, identification and mobile");
+                }
+                // Validate if users insert a non-alphabetic value for name
+                else if (!/^[a-zA-Z]+$/.test(data.name)) {
+                    res.send("Please insert an alphabet for name");
+                }
+                else {
+                    // insert visitor into database
                 const result = await client.db("Assignment").collection("Visitors").insertOne(data);
 
                 res.send({
@@ -550,6 +571,7 @@ async function run() {
                     "mobile": data.mobile,
                     "visitpurpose": data.visitpurpose,
                 });
+        }
 
                 // // generate QR code
                 // QRCode.toDataURL(data._id, (err, url) => {

@@ -1,10 +1,17 @@
 const express = require('express');
 const session = require('express-session');
+const rateLimit = require('express-rate-limit');
 const app = express();
 const port = process.env.PORT || 3000;
 
 // json middleware
 app.use(express.json());
+
+// rate limiter middleware
+const limiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute window 
+    max: 10 // start blocking after 10 requests
+});
 
 // connect to mongodb
 const {
@@ -154,7 +161,7 @@ async function run() {
          *         description: Connection successful
          */
 
-        app.post('/login', async (req, res) => {
+        app.post('/login', limiter, async (req, res) => {
             let data = req.body;
         
             // check if user exists

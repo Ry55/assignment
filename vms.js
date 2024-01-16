@@ -86,7 +86,7 @@ async function run() {
          *             type: object
          *             properties:
          *               username:
-         *                 type: number
+         *                 type: string
          *               password:
          *                 type: string
          *     responses:
@@ -170,15 +170,15 @@ async function run() {
          *             type: object
          *             properties:
          *               _id:
-         *                 type: number
+         *                 type: string
          *               password:
          *                 type: string
          *               name:
          *                 type: string
          *               apartment:
-         *                 type: number
+         *                 type: string
          *               mobile:
-         *                 type: number
+         *                 type: string
          *     responses:
          *       200:
          *         description: Connection successful
@@ -253,15 +253,15 @@ async function run() {
          *             type: object
          *             properties:
          *               _id:
-         *                 type: number
+         *                 type: string
          *               password:
          *                 type: string
          *               name:
          *                 type: string
          *               apartment:
-         *                 type: number
+         *                 type: string
          *               mobile:
-         *                 type: number
+         *                 type: string
          *     responses:
          *       200:
          *         description: Connection successful
@@ -331,9 +331,9 @@ async function run() {
          *             type: object
          *             properties:
          *               _id:
-         *                 type: number
+         *                 type: string
          *               apartment:
-         *                 type: number
+         *                 type: string
          *     responses:
          *       200:
          *         description: Connection successful
@@ -387,13 +387,13 @@ async function run() {
          *             type: object
          *             properties:
          *               _id:
-         *                 type: number
+         *                 type: string
          *               password:
          *                 type: string
          *               name:
          *                 type: string
          *               mobile:
-         *                 type: number
+         *                 type: string
          *     responses:
          *       200:
          *         description: Connection successful
@@ -463,7 +463,7 @@ async function run() {
          *             type: object
          *             properties:
          *               _id:
-         *                 type: number
+         *                 type: string
          *     responses:
          *       200:
          *         description: Connection successful
@@ -517,15 +517,15 @@ async function run() {
          *             type: object
          *             properties:
          *               apartment:
-         *                 type: number
+         *                 type: string
          *               name:
          *                 type: string
          *               carplate:
-         *                 type: number
+         *                 type: string
          *               identification:
-         *                 type: number
+         *                 type: string
          *               mobile:
-         *                 type: number
+         *                 type: string
          *               visitpurpose:
          *                 type: string
          *     responses:

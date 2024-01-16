@@ -201,6 +201,14 @@ async function run() {
                             //hash password
                             const hashedPassword = await bcrypt.hash(data.password, saltRounds);
 
+                            // Ensure that id, apartment, and mobile are inserted as numbers
+                            data._id = parseInt(data._id);
+                            data.apartment = parseInt(data.apartment);
+                            data.mobile = parseInt(data.mobile);
+
+                            // Ensure that name is inserted as a string
+                            data.name = data.name.toString();
+
                             //insert user
                             const result = await client.db("Assignment").collection("Users").insertOne({
                                 _id: data._id,
@@ -215,7 +223,17 @@ async function run() {
                                 blockedvisitors: []
                             });
 
-                            res.send('New resident created with the following id: ' + result.insertedId);
+                            //if users insert a non-number for id, apartment, or mobile, send an error
+                            if (isNaN(data._id) || isNaN(data.apartment) || isNaN(data.mobile)) {
+                                res.send("Please insert a number for id, apartment, and mobile");
+                            }
+                            //if users insert a non-string for name, send an error
+                            else if (typeof data.name != "string") {
+                                res.send("Please insert a string for name");
+                            }
+                            else {
+                                res.send('New resident created with the following id: ' + result.insertedId);
+                            }
                         }
                     } catch (e) {
                         res.send("Error creating new resident");

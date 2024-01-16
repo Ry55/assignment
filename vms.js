@@ -426,6 +426,7 @@ async function run() {
          *               _id:
          *                 type: string
          *               password:
+         *                 description: Password must contain at least 8 characters, 1 uppercase letter, 1 lowercase letter, 1 digit, 1 symbol and no spaces
          *                 type: string
          *               name:
          *                 type: string

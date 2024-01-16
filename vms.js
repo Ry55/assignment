@@ -599,9 +599,13 @@ async function run() {
                     }
                 });
 
-                // Validate if users insert a non-number for carplate, identification, or mobile
-                if (!/^\d+$/.test(data.carplate) || !/^\d+$/.test(data.identification) || !/^\d+$/.test(data.mobile)) {
-                    res.send("Please insert a valid number for carplate, identification and mobile");
+                // Validate if users insert a non-number for identification, or mobile
+                if (!/^\d+$/.test(data.identification) || !/^\d+$/.test(data.mobile)) {
+                    res.send("Please insert a valid number for identification and mobile");
+                }
+                // Ensure carplate is a combination of alphabet and number without symbols
+                else if (!/^[A-Za-z0-9]+$/.test(data.carplate)) {
+                    res.send("Please insert a valid carplate containing alphabets and numbers");
                 }
                 // Validate if users insert a non-alphabetic value for name
                 else if (!/^[a-zA-Z]+$/.test(data.name)) {

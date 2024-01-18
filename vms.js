@@ -2,7 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const rateLimit = require('express-rate-limit');
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 // json middleware
 app.use(express.json());
@@ -17,7 +17,7 @@ const limiter = rateLimit({
 const {
     MongoClient
 } = require('mongodb'); // import the mongodb client
-const url = process.env.URL || "mongodb+srv://rruyingg:200105054130@cluster0.cwvxo8n.mongodb.net/" // the url to the database
+const url = process.env.URL; // the url to the database
 const client = new MongoClient(url); // create a new mongodb client
 
 //unique session id generator middleware
@@ -28,7 +28,7 @@ const {
 //connect-mongo session middleware
 const MongoStore = require('connect-mongo');
 const store = MongoStore.create({
-    mongoUrl: process.env.URL || "mongodb+srv://rruyingg:200105054130@cluster0.cwvxo8n.mongodb.net/",
+    mongoUrl: process.env.URL,
     dbName: "Assignment",
     collectionName: "Sessions",
     //ttl will be automatically set to the maxAge (1 hour)
@@ -43,7 +43,7 @@ app.use(session({
     genid: (req) => {
         return uuidv4()
     },
-    secret: process.env.SECRET || "supercalifragilisticexpialidocious", // a random string used for encryption
+    secret: process.env.SECRET, // a random string used for encryption
     resave: false, // don't save session if unmodified
     saveUninitialized: false, // don't create session until something stored
     cookie: {
